@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bunty Cabs — Cabs across India, since 2014</title>
+<meta name="description" content="Airport transfers, outstation trips and local rentals across 50+ Indian cities. Call for an exact quote — one number that picks up at 3 AM." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   BUNTY CABS
+   Flat colour system — no gradients anywhere.
+   Black / signal yellow / off-white. Hard edges, hard rules.
+   ============================================================ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  /* flat, non-default values — nothing from a stock palette */
+  --black:#0B0B0B;
+  --black-2:#191917;
+  --black-3:#242420;
+
+  --paper:#FAFAF8;
+  --paper-2:#F1F1EC;
+
+  --body:#5E5E55;
+  --faint:#8E8E83;
+  --line:#DBDBD2;
+  --line-2:#C5C5B8;
+
+  --yellow:#FFD400;
+  --yellow-2:#E0B800;
+
+  --on-dark:#9A9A90;
+  --on-dark-2:#C6C6BC;
+  --dline:rgba(250,250,248,.14);
+
+  --display:'Archivo','Helvetica Neue',Arial,sans-serif;
+  --text:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --serif:'Instrument Serif',Georgia,'Times New Roman',serif;
+
+  --pad:clamp(20px,4vw,56px);
+}
+
+html{scroll-behavior:smooth;scroll-padding-top:64px;-webkit-text-size-adjust:100%}
+
+body{
+  font-family:var(--text);
+  background:var(--paper);
+  color:var(--body);
+  font-size:16px;line-height:1.6;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+
+h1,h2,h3,h4{font-family:var(--display);color:var(--black);font-weight:800;line-height:1;letter-spacing:-.03em}
+a{color:inherit;text-decoration:none}
+img{max-width:100%;display:block}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+ul{list-style:none}
+
+.wrap{max-width:1320px;margin-inline:auto;padding-inline:var(--pad)}
+
+/* --- hard-edged everywhere: radius only on tiny UI --- */
+.kicker{
+  font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
+  color:var(--faint);display:flex;align-items:center;gap:14px;
+}
+.kicker::before{content:"";width:28px;height:2px;background:var(--yellow);flex-shrink:0}
+.on-dark .kicker{color:var(--on-dark)}
+
+.sec-label{
+  display:flex;align-items:baseline;justify-content:space-between;gap:24px;
+  padding-bottom:18px;border-bottom:2px solid var(--black);margin-bottom:44px;
+}
+.sec-label h2{font-size:clamp(1.6rem,2.6vw,2.1rem);font-weight:800;text-transform:uppercase}
+.sec-label .sl-num{font-family:var(--display);font-size:11.5px;font-weight:700;color:var(--faint);letter-spacing:.16em;white-space:nowrap}
+.on-dark .sec-label{border-color:var(--yellow)}
+.on-dark .sec-label h2{color:var(--paper)}
+.on-dark .sec-label .sl-num{color:var(--on-dark)}
+
+/* reveal */
+.rv{animation:up .85s cubic-bezier(.16,1,.3,1) both}
+@keyframes up{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:translateY(0)}}
+@supports (animation-timeline:view()){
+  .rv{animation:up linear both;animation-timeline:view();animation-range:entry 6% cover 24%}
+}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+
+.pbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:5000;pointer-events:none}
+.pbar::after{content:"";display:block;height:100%;background:var(--yellow);transform-origin:left;animation:bar linear;animation-timeline:scroll(root)}
+@supports not (animation-timeline:scroll(root)){.pbar{display:none}}
+
+/* taxi checkered rule */
+.checker{
+  height:12px;background:repeating-conic-gradient(var(--black) 0% 25%,var(--yellow) 0% 50%) 0 0/24px 24px;
+}
+
+/* ============================================================
+   NAV  (flat paper)
+   ============================================================ */
+.nav{position:sticky;top:0;z-index:1000;background:var(--paper);border-bottom:2px solid var(--black)}
+.nav-in{display:flex;align-items:center;gap:32px;height:64px}
+
+.mark{display:flex;align-items:center;gap:10px;margin-right:auto}
+.mark-glyph{
+  width:30px;height:30px;background:var(--yellow);
+  border:2px solid var(--black);
+  display:grid;place-items:center;
+  font-family:var(--display);font-weight:900;font-size:13px;
+  letter-spacing:-.04em;color:var(--black);
+}
+.mark-name{font-family:var(--display);font-weight:800;font-size:16px;color:var(--black);letter-spacing:-.025em;line-height:1}
+
+.nav-links{display:flex;gap:2px}
+.nav-links a{
+  font-size:13.5px;font-weight:500;color:var(--black);
+  padding:7px 12px;position:relative;transition:color .18s;
+}
+.nav-links a::after{
+  content:"";position:absolute;left:12px;right:12px;bottom:1px;height:2px;
+  background:var(--yellow);transform:scaleX(0);transform-origin:left;
+  transition:transform .28s cubic-bezier(.16,1,.3,1);
+}
+.nav-links a:hover::after{transform:scaleX(1)}
+
+.nav-cta{display:flex;align-items:center;gap:18px}
+.nav-tel{font-size:14px;font-weight:600;color:var(--black);font-variant-numeric:tabular-nums;transition:color .18s}
+.nav-tel:hover{color:var(--faint)}
+
+.btn-book{
+  background:var(--yellow);color:var(--black);
+  border:2px solid var(--black);
+  padding:9px 18px;font-family:var(--display);font-size:13.5px;font-weight:800;
+  letter-spacing:-.01em;display:inline-flex;align-items:center;gap:8px;
+  transition:background .2s,color .2s,transform .2s;
+}
+.btn-book:hover{background:var(--black);color:var(--yellow);transform:translateY(-2px)}
+.btn-book svg{width:14px;height:14px;transition:transform .25s}
+.btn-book:hover svg{transform:translateX(3px)}
+
+.burger{display:none;background:none;border:0;padding:8px;cursor:pointer}
+.burger span{display:block;width:20px;height:2px;background:var(--black);margin:4px 0}
+
+/* ============================================================
+   HERO  (flat black)
+   ============================================================ */
+.hero{background:var(--black);color:var(--paper);position:relative;overflow:hidden}
+.hero-grid{
+  display:grid;grid-template-columns:1.05fr .95fr;
+  gap:clamp(24px,4vw,56px);align-items:end;
+  min-height:min(76vh,680px);
+  padding-top:clamp(40px,6vw,72px);
+}
+.hero-copy{padding-bottom:clamp(32px,5vw,64px)}
+.hero h1{
+  font-size:clamp(3rem,8.6vw,7.4rem);
+  font-weight:900;line-height:.85;letter-spacing:-.05em;
+  margin:22px 0 0;text-transform:uppercase;color:var(--paper);
+}
+.hero h1 .out{
+  color:transparent;
+  -webkit-text-stroke:1.5px var(--paper);
+}
+.hero h1 .fill{color:var(--yellow)}
+
+.hero-sub{font-size:clamp(15px,1.3vw,17px);line-height:1.65;color:var(--on-dark-2);max-width:440px;margin-top:26px}
+.hero-sub b{color:var(--paper);font-weight:600}
+
+.hero-actions{display:flex;align-items:center;gap:26px;margin-top:32px;flex-wrap:wrap}
+.btn-lg{
+  background:var(--yellow);color:var(--black);
+  border:2px solid var(--yellow);
+  padding:15px 30px;font-family:var(--display);font-size:15px;font-weight:800;
+  display:inline-flex;align-items:center;gap:10px;
+  transition:background .2s,color .2s,transform .2s;
+}
+.btn-lg:hover{background:transparent;color:var(--yellow);transform:translateY(-2px)}
+.btn-lg svg{width:15px;height:15px;transition:transform .25s}
+.btn-lg:hover svg{transform:translateX(4px)}
+
+.link-tel{
+  font-size:15px;font-weight:600;color:var(--paper);
+  border-bottom:2px solid var(--dline);padding-bottom:3px;
+  font-variant-numeric:tabular-nums;transition:color .2s,border-color .2s;
+}
+.link-tel:hover{color:var(--yellow);border-color:var(--yellow)}
+
+.hero-meta{display:flex;gap:clamp(20px,3.4vw,44px);flex-wrap:wrap;margin-top:44px;padding-top:22px;border-top:1px solid var(--dline)}
+.hm-i .hm-n{font-family:var(--display);font-size:19px;font-weight:800;color:var(--paper);letter-spacing:-.02em;display:block;line-height:1.1}
+.hm-i .hm-l{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--on-dark)}
+
+.hero-car{position:relative;align-self:end}
+.hero-car img{
+  width:118%;margin-left:-9%;
+  animation:float 7s ease-in-out infinite;
+}
+.hero-tag{
+  position:absolute;left:0;bottom:16%;
+  background:var(--yellow);color:var(--black);
+  border:2px solid var(--black);
+  padding:14px 20px;
+  animation:float 7s ease-in-out .7s infinite;
+}
+.hero-tag .ht-n{font-family:var(--display);font-size:22px;font-weight:900;line-height:1;letter-spacing:-.03em}
+.hero-tag .ht-l{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;margin-top:5px}
+
+/* ============================================================
+   TICKER (flat yellow)
+   ============================================================ */
+.ticker{background:var(--yellow);color:var(--black);overflow:hidden;padding:13px 0;border-top:2px solid var(--black);border-bottom:2px solid var(--black)}
+.ticker-track{display:flex;width:max-content;animation:slide 42s linear infinite}
+.ticker-track span{
+  font-family:var(--display);font-size:12.5px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;
+  padding-inline:26px;display:inline-flex;align-items:center;gap:26px;white-space:nowrap;
+}
+.ticker-track span::after{content:"";width:6px;height:6px;background:var(--black)}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+.sec{padding:clamp(64px,8vw,110px) 0}
+.on-dark{background:var(--black);color:var(--on-dark-2)}
+.on-dark h2,.on-dark h3,.on-dark h4{color:var(--paper)}
+.on-dark p{color:var(--on-dark-2)}
+
+/* --- SERVICES: numbered index --- */
+.svc-list{border-top:2px solid var(--black)}
+.svc-row{
+  display:grid;grid-template-columns:60px 1fr 1.4fr 40px;
+  gap:20px;align-items:center;
+  padding:26px 16px 26px 0;border-bottom:1px solid var(--line-2);
+  transition:background .2s,padding .28s cubic-bezier(.16,1,.3,1);
+  position:relative;
+}
+.svc-row::before{content:"";position:absolute;inset:0 -16px;background:var(--yellow);opacity:0;transition:opacity .2s;z-index:-1}
+.svc-row:hover{padding-left:16px}
+.svc-row:hover::before{opacity:1}
+.svc-num{font-family:var(--display);font-size:12px;font-weight:700;color:var(--faint);letter-spacing:.1em}
+.svc-row:hover .svc-num{color:var(--black)}
+.svc-name{font-family:var(--display);font-size:clamp(1.05rem,1.7vw,1.35rem);font-weight:800;color:var(--black);letter-spacing:-.025em;line-height:1.15}
+.svc-desc{font-size:14.5px;color:var(--body);line-height:1.5}
+.svc-arrow{
+  width:32px;height:32px;border:2px solid var(--black);
+  display:grid;place-items:center;justify-self:end;
+  transition:background .2s,transform .28s cubic-bezier(.16,1,.3,1);
+}
+.svc-arrow svg{width:14px;height:14px;stroke:var(--black)}
+.svc-row:hover .svc-arrow{background:var(--black);transform:translateX(4px)}
+.svc-row:hover .svc-arrow svg{stroke:var(--yellow)}
+
+.fare-foot{
+  margin-top:26px;padding:20px 22px;
+  background:var(--yellow);border:2px solid var(--black);
+  font-size:14px;line-height:1.65;color:var(--black);
+}
+.fare-foot b{font-weight:800}
+
+/* --- STANDARDS (on black) --- */
+.why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0 clamp(28px,4vw,64px)}
+.why-i{
+  padding:24px 0;border-bottom:1px solid var(--dline);
+  display:grid;grid-template-columns:36px 1fr;gap:16px;align-items:start;
+}
+.why-i .wi-n{font-family:var(--display);font-size:11px;font-weight:800;color:var(--yellow);letter-spacing:.08em;padding-top:4px}
+.why-i h4{font-family:var(--display);font-size:15.5px;font-weight:800;color:var(--paper);letter-spacing:-.02em;margin-bottom:5px}
+.why-i p{font-size:14px;color:var(--on-dark);line-height:1.6}
+
+/* --- ABOUT --- */
+.about-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(28px,4.5vw,64px);align-items:center}
+.owner-shot{position:relative}
+.os-img{
+  position:relative;z-index:1;border:2px solid var(--black);
+  filter:grayscale(1) contrast(1.08);transition:filter .6s ease;
+  aspect-ratio:4/5;object-fit:cover;object-position:center 22%;width:100%;
+}
+.owner-shot:hover .os-img{filter:grayscale(0) contrast(1)}
+.owner-shot::before{content:"";position:absolute;inset:0;background:var(--yellow);transform:translate(14px,14px);z-index:0}
+.owner-tag{
+  position:absolute;bottom:-2px;left:-2px;z-index:2;
+  background:var(--black);color:var(--paper);padding:12px 20px;border:2px solid var(--black);
+}
+.owner-tag .ot-n{font-family:var(--display);font-size:17px;font-weight:800;letter-spacing:-.02em;line-height:1}
+.owner-tag .ot-r{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--yellow);margin-top:4px}
+
+.about-copy h2{font-size:clamp(1.9rem,3.6vw,3rem);font-weight:900;letter-spacing:-.04em;margin:18px 0 24px;text-transform:uppercase;line-height:.9}
+.about-copy p{font-size:16px;line-height:1.75;margin-bottom:18px;max-width:540px}
+.about-copy p strong{color:var(--black);font-weight:700}
+.ac-quote{
+  font-family:var(--serif);font-size:clamp(1.15rem,1.9vw,1.5rem);
+  line-height:1.45;color:var(--black);font-style:italic;
+  border-left:4px solid var(--yellow);padding-left:22px;margin:30px 0 26px;
+}
+.ac-sig{font-family:var(--serif);font-size:20px;color:var(--black);font-style:italic}
+
+/* --- REVIEWS (on black) --- */
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,3.5vw,48px)}
+.rev{padding-top:26px;border-top:4px solid var(--yellow)}
+.rv-stars{display:flex;gap:3px;margin-bottom:18px}
+.rv-stars svg{width:13px;height:13px;fill:var(--yellow)}
+.rev blockquote{font-family:var(--serif);font-size:clamp(1.05rem,1.5vw,1.25rem);line-height:1.5;color:var(--paper);margin-bottom:22px;font-style:italic}
+.rv-by{display:flex;align-items:center;gap:12px}
+.rv-av{
+  width:36px;height:36px;background:var(--yellow);color:var(--black);
+  border:2px solid var(--black);
+  display:grid;place-items:center;flex-shrink:0;
+  font-family:var(--display);font-size:13px;font-weight:800;
+}
+.rv-n{font-size:13.5px;font-weight:600;color:var(--paper);line-height:1.3}
+.rv-l{font-size:12px;color:var(--on-dark)}
+
+/* --- CONTACT (on black) --- */
+.c-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,80px)}
+.c-left h3{font-size:clamp(2rem,4.4vw,3.4rem);font-weight:900;letter-spacing:-.045em;color:var(--paper);text-transform:uppercase;line-height:.88;margin-bottom:22px}
+.c-left>p{font-size:15.5px;line-height:1.7;color:var(--on-dark);margin-bottom:40px;max-width:420px}
+
+.c-big-tel{
+  display:block;font-family:var(--display);
+  font-size:clamp(1.5rem,3vw,2.3rem);font-weight:800;letter-spacing:-.035em;
+  color:var(--yellow);font-variant-numeric:tabular-nums;
+  padding-bottom:10px;border-bottom:2px solid var(--dline);
+  transition:border-color .2s;margin-bottom:8px;
+}
+.c-big-tel:hover{border-color:var(--yellow)}
+.c-tel-note{font-size:11px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark);margin-bottom:38px}
+
+.c-details{display:grid;margin-bottom:34px}
+.c-d{display:grid;grid-template-columns:22px 1fr;gap:14px;align-items:start;padding:15px 0;border-top:1px solid var(--dline)}
+.c-d svg{width:15px;height:15px;stroke:var(--yellow);fill:none;margin-top:4px}
+.cd-l{font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark);margin-bottom:4px}
+.cd-v{font-size:14.5px;color:var(--paper);line-height:1.55}
+.c-d a:hover{color:var(--yellow)}
+
+.btn-wa{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--paper);color:var(--black);border:2px solid var(--paper);
+  padding:14px 26px;font-family:var(--display);font-size:14.5px;font-weight:800;
+  transition:background .2s,color .2s,transform .2s;
+}
+.btn-wa:hover{background:transparent;color:var(--paper);transform:translateY(-2px)}
+.btn-wa svg{width:17px;height:17px;fill:currentColor}
+
+/* form — underline inputs */
+.form{padding-top:6px}
+.f-row{margin-bottom:26px}
+.form label{display:block;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--on-dark);margin-bottom:9px}
+.form input,.form select,.form textarea{
+  width:100%;background:transparent;border:0;
+  border-bottom:2px solid var(--dline);
+  padding:10px 0;font-size:15px;color:var(--paper);
+  transition:border-color .25s;border-radius:0;
+}
+.form textarea{resize:vertical;min-height:78px}
+.form input::placeholder,.form textarea::placeholder{color:#6B6B62}
+.form input:focus,.form select:focus,.form textarea:focus{outline:none;border-color:var(--yellow)}
+.form select option{background:var(--black);color:var(--paper)}
+.f-pair{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+
+.form-submit{
+  width:100%;background:var(--yellow);color:var(--black);
+  border:2px solid var(--yellow);
+  padding:16px;font-family:var(--display);font-size:15px;font-weight:800;
+  letter-spacing:-.01em;margin-top:8px;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:background .2s,color .2s,transform .2s;
+}
+.form-submit:hover{background:transparent;color:var(--yellow);transform:translateY(-2px)}
+.form-submit svg{width:15px;height:15px;transition:transform .25s}
+.form-submit:hover svg{transform:translateX(4px)}
+.f-note{font-size:12.5px;color:var(--on-dark);margin-top:16px;text-align:center}
+
+.c-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.btn-social{
+  width:52px;height:52px;flex-shrink:0;
+  border:2px solid var(--paper);
+  display:grid;place-items:center;color:var(--paper);
+  transition:background .2s,color .2s,transform .2s;
+}
+.btn-social svg{width:21px;height:21px}
+.btn-social:hover{background:var(--paper);color:var(--black);transform:translateY(-2px)}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.foot{background:var(--black);color:var(--on-dark);border-top:1px solid var(--dline);padding:44px 0 0}
+.foot-in{display:flex;align-items:flex-start;justify-content:space-between;gap:40px;flex-wrap:wrap;padding-bottom:36px}
+.foot-brand .fb-m{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.foot-brand p{font-size:13.5px;max-width:300px;line-height:1.65;color:var(--on-dark)}
+
+.socials{display:flex;gap:10px;margin-top:24px}
+.socials a{
+  width:40px;height:40px;
+  border:2px solid var(--dline);
+  display:grid;place-items:center;color:var(--on-dark-2);
+  transition:background .2s,color .2s,border-color .2s,transform .2s;
+}
+.socials a svg{width:18px;height:18px}
+.socials a:hover{background:var(--yellow);border-color:var(--yellow);color:var(--black);transform:translateY(-3px)}
+.foot-links{display:flex;gap:clamp(24px,4vw,56px);flex-wrap:wrap}
+.foot-col h5{font-family:var(--display);font-size:10.5px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--yellow);margin-bottom:14px}
+.foot-col ul{display:grid;gap:9px}
+.foot-col li{font-size:13.5px;color:var(--on-dark-2);transition:color .2s,transform .2s}
+.foot-col li:hover{color:var(--yellow);transform:translateX(3px)}
+
+.foot-wordmark{border-top:1px solid var(--dline);padding:26px 0 30px;overflow:hidden}
+.foot-wordmark span{
+  display:block;font-family:var(--display);font-weight:900;
+  font-size:clamp(3rem,13vw,11rem);line-height:.78;letter-spacing:-.05em;
+  color:transparent;-webkit-text-stroke:1.5px var(--yellow);
+  text-transform:uppercase;white-space:nowrap;
+}
+.foot-base{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  padding:18px 0 26px;border-top:1px solid var(--dline);font-size:12.5px;color:var(--on-dark);
+}
+.foot-base a:hover{color:var(--yellow)}
+
+.float-wa{
+  position:fixed;bottom:22px;right:22px;z-index:900;
+  width:52px;height:52px;background:var(--yellow);border:2px solid var(--black);
+  display:grid;place-items:center;transition:transform .24s;
+}
+.float-wa:hover{transform:scale(1.07)}
+.float-wa svg{width:24px;height:24px;fill:var(--black)}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:1000px){
+  .svc-row{grid-template-columns:44px 1fr 40px;gap:14px}
+  .svc-desc{display:none}
+  .svc-arrow{display:none}
+  .why-grid{grid-template-columns:1fr}
+  .rev-grid{grid-template-columns:1fr;gap:32px}
+  .about-grid,.c-grid{grid-template-columns:1fr;gap:40px}
+  .hero-grid{grid-template-columns:1fr;min-height:0;gap:32px}
+  .hero-car img{width:100%;margin-left:0}
+  .hero-tag{position:static;margin-top:18px;display:inline-block;animation:none}
+}
+@media (max-width:760px){
+  .nav-links,.nav-tel{display:none}
+  .burger{display:block}
+  .hero h1{font-size:clamp(2.6rem,12vw,4rem)}
+  .hero-meta{gap:20px}
+  .hm-i .hm-n{font-size:16px}
+  .sec-label{flex-direction:column;align-items:flex-start;gap:8px}
+  .f-pair{grid-template-columns:1fr;gap:0}
+  .foot-in{flex-direction:column;gap:28px}
+  .foot-links{gap:28px}
+  .owner-shot::before{transform:translate(8px,8px)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+
+<div class="pbar" aria-hidden="true"></div>
+
+<!-- ===================== NAV ===================== -->
+<nav class="nav">
+  <div class="wrap nav-in">
+    <a href="#top" class="mark">
+      <span class="mark-glyph">BC</span>
+      <span class="mark-name">Bunty Cabs</span>
+    </a>
+    <div class="nav-links">
+      <a href="#services">Services</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#about">About</a>
+      <a href="#book">Contact</a>
+    </div>
+    <div class="nav-cta">
+      <a href="tel:+919888303859" class="nav-tel">+91 98883 03859</a>
+      <a href="#book" class="btn-book">
+        Book a cab
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <button class="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===================== HERO (black) ===================== -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <div class="kicker">Pan-India · Since 2014</div>
+        <h1>
+          Cabs that<br>
+          actually<br>
+          <span class="out">show</span> <span class="fill">up.</span>
+        </h1>
+        <p class="hero-sub">
+          Airport runs, outstation trips and local rentals across <b>50+ cities</b>.
+          Fixed fares quoted before you board. <b>One number that picks up at 3 AM.</b>
+        </p>
+        <div class="hero-actions">
+          <a href="#book" class="btn-lg">
+            Book a cab
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+          <a href="tel:+919888303859" class="link-tel">or call +91 98883 03859</a>
+        </div>
+        <div class="hero-meta">
+          <div class="hm-i"><span class="hm-n">4.8★</span><span class="hm-l">Rider rating</span></div>
+          <div class="hm-i"><span class="hm-n">50+</span><span class="hm-l">Cities</span></div>
+          <div class="hm-i"><span class="hm-n">24×7</span><span class="hm-l">Dispatch</span></div>
+          <div class="hm-i"><span class="hm-n">100%</span><span class="hm-l">Verified drivers</span></div>
+        </div>
+      </div>
+
+      <div class="hero-car">
+        <img src="assets/car.jpg" alt="Bunty Cabs Hyundai Aura" />
+        <div class="hero-tag">
+          <div class="ht-n">Sedan</div>
+          <div class="ht-l">AC · 4 seats</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>Delhi NCR</span><span>Mumbai</span><span>Bengaluru</span><span>Hyderabad</span><span>Chennai</span><span>Kolkata</span><span>Pune</span><span>Jaipur</span><span>Goa</span><span>Chandigarh</span><span>Lucknow</span><span>Agra</span><span>Shimla</span><span>Manali</span><span>Udaipur</span><span>Kochi</span><span>Amritsar</span><span>Varanasi</span>
+      <span>Delhi NCR</span><span>Mumbai</span><span>Bengaluru</span><span>Hyderabad</span><span>Chennai</span><span>Kolkata</span><span>Pune</span><span>Jaipur</span><span>Goa</span><span>Chandigarh</span><span>Lucknow</span><span>Agra</span><span>Shimla</span><span>Manali</span><span>Udaipur</span><span>Kochi</span><span>Amritsar</span><span>Varanasi</span>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== SERVICES ===================== -->
+<section class="sec" id="services">
+  <div class="wrap">
+    <div class="sec-label rv">
+      <h2>Six things we drive for</h2>
+      <span class="sl-num">01 — Services</span>
+    </div>
+
+    <div class="svc-list">
+      <a href="#book" class="svc-row rv">
+        <span class="svc-num">01</span>
+        <span class="svc-name">Airport Transfers</span>
+        <span class="svc-desc">Flight tracked. 45 min free waiting. Meet at arrivals.</span>
+        <span class="svc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a href="#book" class="svc-row rv">
+        <span class="svc-num">02</span>
+        <span class="svc-name">Outstation Trips</span>
+        <span class="svc-desc">One-way or round trip. Drivers who know the ghat roads.</span>
+        <span class="svc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a href="#book" class="svc-row rv">
+        <span class="svc-num">03</span>
+        <span class="svc-name">Local Rentals</span>
+        <span class="svc-desc">4, 8 and 12 hour packages. Change stops as the day changes.</span>
+        <span class="svc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a href="#book" class="svc-row rv">
+        <span class="svc-num">04</span>
+        <span class="svc-name">Wedding &amp; Events</span>
+        <span class="svc-desc">Multi-car fleets, decorated, one coordinator running it.</span>
+        <span class="svc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a href="#book" class="svc-row rv">
+        <span class="svc-num">05</span>
+        <span class="svc-name">Corporate Travel</span>
+        <span class="svc-desc">Monthly billing, GST invoices, priority dispatch for staff.</span>
+        <span class="svc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+      <a href="#book" class="svc-row rv">
+        <span class="svc-num">06</span>
+        <span class="svc-name">Emergency Rides</span>
+        <span class="svc-desc">Hospital runs, missed trains, 3 AM pickups. We answer.</span>
+        <span class="svc-arrow"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </a>
+    </div>
+
+    <div class="fare-foot rv">
+      <b>Every trip is quoted individually.</b> Share your route and we will send one all-inclusive figure — fuel and driver included, no surge, nothing added later. Toll and parking billed at actuals, with receipts.
+    </div>
+  </div>
+</section>
+
+<!-- ===================== STANDARDS (black) ===================== -->
+<section class="sec on-dark">
+  <div class="wrap">
+    <div class="sec-label rv">
+      <h2>How we run things</h2>
+      <span class="sl-num">02 — Standards</span>
+    </div>
+    <div class="why-grid">
+      <div class="why-i rv"><span class="wi-n">01</span><div><h4>Drivers are police-verified</h4><p>Background check, licence validation and in-house training before anyone touches a key.</p></div></div>
+      <div class="why-i rv"><span class="wi-n">02</span><div><h4>Fare is fixed before pickup</h4><p>Quoted in writing. No surge multiplier, no renegotiation at the end of the trip.</p></div></div>
+      <div class="why-i rv"><span class="wi-n">03</span><div><h4>Cars cleaned between trips</h4><p>Interior vacuum, sanitised surfaces, AC checked. Every trip, without exception.</p></div></div>
+      <div class="why-i rv"><span class="wi-n">04</span><div><h4>You can share your trip</h4><p>Send a live location link to family. They see the route until you reach.</p></div></div>
+      <div class="why-i rv"><span class="wi-n">05</span><div><h4>A human answers the phone</h4><p>Dispatch is staffed 24 hours. Not a bot, not a callback queue.</p></div></div>
+      <div class="why-i rv"><span class="wi-n">06</span><div><h4>Cancel free, up to 2 hours</h4><p>Plans change. Tell us two hours before pickup and there is no charge.</p></div></div>
+      <div class="why-i rv"><span class="wi-n">07</span><div><h4>Proper GST invoices</h4><p>Every ride billed properly, so reimbursements and accounts stay clean.</p></div></div>
+      <div class="why-i rv"><span class="wi-n">08</span><div><h4>Luggage handled, not thrown</h4><p>Roof carriers for outstation. Loading is the driver's job, not yours.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== ABOUT ===================== -->
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="owner-shot rv">
+        <img class="os-img" src="assets/owner.jpg" alt="Bunty — founder, Bunty Cabs" />
+        <div class="owner-tag">
+          <div class="ot-n">Bunty</div>
+          <div class="ot-r">Founder</div>
+        </div>
+      </div>
+
+      <div class="about-copy rv">
+        <div class="kicker">03 — The person behind it</div>
+        <h2>Started with<br>one car,<br>one promise.</h2>
+        <p>
+          In 2014 Bunty was driving a single white sedan out of a rented parking spot in West Delhi. The pitch was not clever — <strong>show up on time, keep the car clean, charge what you said you would</strong>. Eleven years later that is still the whole operating manual.
+        </p>
+        <p>
+          Today the same rule covers trips to fifty-odd cities, and a dispatch line that runs through the night. The car changed. The rule did not.
+        </p>
+        <div class="ac-quote">
+          Anyone can put a car on the road. The hard part is answering the phone at 3 AM and being there twenty minutes later. That is the part I refuse to get wrong.
+        </div>
+        <div class="ac-sig">— Bunty</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== REVIEWS (black) ===================== -->
+<section class="sec on-dark" id="reviews">
+  <div class="wrap">
+    <div class="sec-label rv">
+      <h2>What riders say</h2>
+      <span class="sl-num">04 — Reviews</span>
+    </div>
+    <div class="rev-grid">
+      <div class="rev rv">
+        <div class="rv-stars">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+        </div>
+        <blockquote>Delhi to Manali, four days. The driver knew every bad patch on that road before we hit it. Car was spotless, and the final bill matched the quote to the rupee.</blockquote>
+        <div class="rv-by"><div class="rv-av">R</div><div><div class="rv-n">Rahul Sharma</div><div class="rv-l">Delhi → Manali · Outstation</div></div></div>
+      </div>
+
+      <div class="rev rv">
+        <div class="rv-stars">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+        </div>
+        <blockquote>Flight landed at 2:10 AM, two hours late. Driver was standing there with my name on a card and did not charge a rupee for the wait. That is not normal service.</blockquote>
+        <div class="rv-by"><div class="rv-av">A</div><div><div class="rv-n">Amit Patel</div><div class="rv-l">Mumbai · Airport transfer</div></div></div>
+      </div>
+
+      <div class="rev rv">
+        <div class="rv-stars">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8l-6.2 3.2L7 14.2 2 9.3l6.9-1z"/></svg>
+        </div>
+        <blockquote>Nine cars for a three-day wedding. Everything arrived decorated and on the minute. I did not have to chase a single driver — the coordinator handled all of it.</blockquote>
+        <div class="rv-by"><div class="rv-av">P</div><div><div class="rv-n">Priya Verma</div><div class="rv-l">Jaipur · Wedding fleet</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== CONTACT (black) ===================== -->
+<section class="sec on-dark" id="book">
+  <div class="wrap">
+    <div class="sec-label rv">
+      <h2>Book a cab</h2>
+      <span class="sl-num">05 — Contact</span>
+    </div>
+
+    <div class="c-grid">
+      <div class="c-left rv">
+        <h3>Tell us<br>where to<br>be.</h3>
+        <p>Send the form, or just call. Dispatch confirms most bookings within five minutes, any hour of the day.</p>
+
+        <a href="tel:+919888303859" class="c-big-tel">+91 98883 03859</a>
+        <div class="c-tel-note">Dispatch · Open 24 hours, 365 days</div>
+
+        <div class="c-details">
+          <div class="c-d">
+            <svg viewBox="0 0 24 24" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            <div><div class="cd-l">Average response</div><div class="cd-v">Under 5 minutes, 24×7</div></div>
+          </div>
+        </div>
+
+        <div class="c-actions">
+          <a href="https://wa.me/919888303859" target="_blank" rel="noopener" class="btn-wa">
+            <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.5 14.1c-.2.6-1.3 1.2-1.8 1.3-.5 0-1.1.1-1.8-.1a13 13 0 0 1-5.4-4.6c-.4-.5-.9-1.4-.9-2.6 0-1.3.7-1.9.9-2.1.2-.3.5-.4.7-.4l.5.1c.2 0 .4 0 .6.4l.7 1.6c0 .2 0 .3 0 .4l-.3.5c-.1.2-.3.3-.4.4l-.2.2c0 .1 0 .3.2.5.4.7.9 1.3 1.6 1.8.6.4 1.2.6 1.4.5.2-.1.7-.8.9-1.1.2-.3.4-.3.7-.2l1.3.6c.3.1.5.2.6.3.1.2.1.8-.2 1.4z"/></svg>
+            Message us on WhatsApp
+          </a>
+          <a href="https://www.instagram.com/bunty_chanalia/" target="_blank" rel="noopener" class="btn-social" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="rv">
+        <form class="form" onsubmit="event.preventDefault(); this.innerHTML='&lt;div style=&quot;padding:56px 0;text-align:center&quot;&gt;&lt;div style=&quot;font-family:Archivo,sans-serif;font-size:68px;font-weight:900;color:#FFD400;line-height:1&quot;&gt;&amp;#10003;&lt;/div&gt;&lt;h3 style=&quot;font-family:Archivo,sans-serif;font-size:26px;font-weight:900;color:#FAFAF8;margin:20px 0 10px;letter-spacing:-.03em;text-transform:uppercase&quot;&gt;Got it.&lt;/h3&gt;&lt;p style=&quot;color:#9A9A90;font-size:15px&quot;&gt;Dispatch will call you back within five minutes.&lt;/p&gt;&lt;/div&gt;';">
+          <div class="f-pair">
+            <div class="f-row"><label>Your name</label><input type="text" placeholder="Rahul Sharma" required></div>
+            <div class="f-row"><label>Phone number</label><input type="tel" placeholder="+91 98883 03859" required></div>
+          </div>
+          <div class="f-row"><label>Pickup location</label><input type="text" placeholder="IGI Airport Terminal 3, Delhi" required></div>
+          <div class="f-row"><label>Drop location</label><input type="text" placeholder="Connaught Place, New Delhi" required></div>
+          <div class="f-pair">
+            <div class="f-row"><label>Date</label><input type="date" required></div>
+            <div class="f-row"><label>Time</label><input type="time" required></div>
+          </div>
+          <div class="f-row">
+            <label>Trip type</label>
+            <select required>
+              <option value="">Select one</option>
+              <option>Airport transfer</option>
+              <option>Outstation — one way</option>
+              <option>Outstation — round trip</option>
+              <option>Local rental — 4 hours</option>
+              <option>Local rental — 8 hours</option>
+              <option>Local rental — 12 hours</option>
+              <option>Wedding or event fleet</option>
+              <option>Corporate booking</option>
+            </select>
+          </div>
+          <div class="f-row">
+            <label>Anything else</label>
+            <textarea placeholder="Child seat, extra luggage, multiple stops..."></textarea>
+          </div>
+          <button type="submit" class="form-submit">
+            Send booking request
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </button>
+          <p class="f-note">No advance payment. No spam. Cancel free up to 2 hours before pickup.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<div class="checker" aria-hidden="true"></div>
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-in">
+      <div class="foot-brand">
+        <div class="fb-m">
+          <span class="mark-glyph">BC</span>
+          <span class="mark-name" style="color:var(--paper)">Bunty Cabs</span>
+        </div>
+        <p>Cabs across India since 2014. Fixed fares, verified drivers, and a phone line that always picks up.</p>
+        <div class="socials">
+          <a href="https://www.instagram.com/bunty_chanalia/" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor" stroke="none"/></svg>
+          </a>
+          <a href="https://wa.me/919888303859" target="_blank" rel="noopener" aria-label="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.5 14.1c-.2.6-1.3 1.2-1.8 1.3-.5 0-1.1.1-1.8-.1a13 13 0 0 1-5.4-4.6c-.4-.5-.9-1.4-.9-2.6 0-1.3.7-1.9.9-2.1.2-.3.5-.4.7-.4l.5.1c.2 0 .4 0 .6.4l.7 1.6c0 .2 0 .3 0 .4l-.3.5c-.1.2-.3.3-.4.4l-.2.2c0 .1 0 .3.2.5.4.7.9 1.3 1.6 1.8.6.4 1.2.6 1.4.5.2-.1.7-.8.9-1.1.2-.3.4-.3.7-.2l1.3.6c.3.1.5.2.6.3.1.2.1.8-.2 1.4z"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="foot-links">
+        <div class="foot-col">
+          <h5>Services</h5>
+          <ul><li>Airport transfers</li><li>Outstation trips</li><li>Local rentals</li><li>Wedding fleets</li><li>Corporate travel</li></ul>
+        </div>
+        <div class="foot-col">
+          <h5>Popular routes</h5>
+          <ul><li>Delhi → Manali</li><li>Delhi → Jaipur</li><li>Mumbai → Goa</li><li>Bengaluru → Mysore</li><li>Chandigarh → Shimla</li></ul>
+        </div>
+        <div class="foot-col">
+          <h5>Company</h5>
+          <ul><li><a href="#about">About Bunty</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#book">Contact</a></li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-wordmark" aria-hidden="true"><span>Bunty Cabs</span></div>
+
+    <div class="foot-base">
+      <span>© 2026 Bunty Cab Services · New Delhi, India</span>
+      <span><a href="tel:+919888303859">+91 98883 03859</a></span>
+    </div>
+  </div>
+</footer>
+
+<a class="float-wa" href="https://wa.me/919888303859" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm5.5 14.1c-.2.6-1.3 1.2-1.8 1.3-.5 0-1.1.1-1.8-.1a13 13 0 0 1-5.4-4.6c-.4-.5-.9-1.4-.9-2.6 0-1.3.7-1.9.9-2.1.2-.3.5-.4.7-.4l.5.1c.2 0 .4 0 .6.4l.7 1.6c0 .2 0 .3 0 .4l-.3.5c-.1.2-.3.3-.4.4l-.2.2c0 .1 0 .3.2.5.4.7.9 1.3 1.6 1.8.6.4 1.2.6 1.4.5.2-.1.7-.8.9-1.1.2-.3.4-.3.7-.2l1.3.6c.3.1.5.2.6.3.1.2.1.8-.2 1.4z"/></svg>
+</a>
+
+</body>
+</html>
